@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Green Campus</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_light">Light</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_report">Report</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="turn_on">Turn ON</string>
+    <string name="turn_off">Turn OFF</string>
+
+</resources>

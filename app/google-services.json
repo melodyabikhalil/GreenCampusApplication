@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "181045089719",
+    "firebase_url": "https://green-campus-esib.firebaseio.com",
+    "project_id": "green-campus-esib",
+    "storage_bucket": "green-campus-esib.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:181045089719:android:58039c0f8380c7a6",
+        "android_client_info": {
+          "package_name": "com.example.firebaseTest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "181045089719-pan18djk57445cdejk9ued0aetviomsc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoJKpxP1QhQpcD5DyatEkE0rbadnjJsVQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:181045089719:android:4c3adf2e3a758f90",
+        "android_client_info": {
+          "package_name": "com.example.greencampus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "181045089719-7piti30lns0vqu1rt1u343cf5f63agbe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.greencampus",
+            "certificate_hash": "bc991806c81021a4edf8c5e991bf7a384f31ab24"
+          }
+        },
+        {
+          "client_id": "181045089719-pan18djk57445cdejk9ued0aetviomsc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoJKpxP1QhQpcD5DyatEkE0rbadnjJsVQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "181045089719-pan18djk57445cdejk9ued0aetviomsc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
