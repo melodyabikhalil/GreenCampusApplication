@@ -152,6 +152,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 globals.setUser(firebaseAuth.getCurrentUser().getUid());
                                 createUserData();
+                                finish();
                             } else {
                                 tvError.setText("Invalid email");
                                 tvError.setVisibility(View.VISIBLE);

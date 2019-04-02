@@ -1,22 +1,31 @@
 package model;
 
 public class Class {
-    private String className;
-    private int isOn;
+    private String classID;
+    private String isOn;
+
+    public Class(String classID, String isOn) {
+        this.classID = classID;
+        this.isOn = isOn;
+    }
+
+    public Class(){
+
+    }
 
     public String getClassName() {
-        return className;
+        return classID;
     }
 
     public void setClassName(String className) {
-        this.className = className;
+        this.classID = className;
     }
 
-    public int getIsOn() {
+    public String getIsOn() {
         return isOn;
     }
 
-    public void setIsOn(int isOn) {
+    public void setIsOn(String isOn) {
         this.isOn = isOn;
     }
 }

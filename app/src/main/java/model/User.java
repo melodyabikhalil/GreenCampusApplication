@@ -4,103 +4,74 @@ package model;
 
 public class User {
     private String ID;
-    private String firstname;
-    private String lastname;
-    private String phone;
-    private String role;
-    private String classID;
+    private String FirstName;
+    private String LastName;
+    private String PhoneNumber;
+    private String Role;
+    private String Class;
 
-    public User(String ID, String firstname, String lastname, String phone, String role, String classID){
+    public User(String ID, String FirstName, String LastName, String PhoneNumber, String Role, String Class) {
         this.ID = ID;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.phone=phone;
-        this.role=role;
-        this.classID=classID;
+        this.FirstName = FirstName;
+        this.LastName = LastName;
+        this.PhoneNumber = PhoneNumber;
+        this.Role = Role;
+        this.Class = Class;
     }
 
-    public User(String ID, String firstname, String lastname, String phone, String role){
+    public User(String ID, String FirstName, String LastName, String PhoneNumber, String Role) {
         this.ID = ID;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.phone=phone;
-        this.role=role;
-    }
-
-    /*private User(String firstname, String lastname, int phone, int role, String classID){
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.phone=phone;
-        this.role=role;
-        this.classID=classID;
-    }
-
-    private User(String firstname, String lastname, int phone, int role){
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.phone=phone;
-        this.role=role;
-    }
-
-    public User getUser(){
-        if(this.getRole()==0){
-            return new User(this.firstname, this.lastname, this.phone, this.role);
-        }
-        else{
-            return new User(this.firstname, this.lastname, this.phone, this.role, this.getClass().getName());
-
-        }
-    }
-*/
-    public void setID(String ID) {
-        this.ID = ID;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public void setClassID(String classID) {
-        this.classID = classID;
+        this.FirstName = FirstName;
+        this.LastName = LastName;
+        this.PhoneNumber = PhoneNumber;
+        this.Role = Role;
     }
 
     public String getID() {
         return ID;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public void setID(String ID) {
+        this.ID = ID;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getFirstName() {
+        return FirstName;
     }
 
-    public String getPhone() {
-        return phone;
+    public void setFirstName(String firstName) {
+        FirstName = firstName;
+    }
+
+    public String getLastName() {
+        return LastName;
+    }
+
+    public void setLastName(String lastName) {
+        LastName = lastName;
+    }
+
+    public String getPhoneNumber() {
+        return PhoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        PhoneNumber = phoneNumber;
     }
 
     public String getRole() {
-        return role;
+        return Role;
+    }
+
+    public void setRole(String role) {
+        Role = role;
     }
 
     public String getClassID() {
-        return classID;
+        return Class;
     }
 
-    public boolean isAuthenticated(){
-        return true;
+    public void setClass(String aClass) {
+        Class = aClass;
     }
 }
