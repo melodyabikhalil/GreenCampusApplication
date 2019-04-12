@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdministratorLightFragment">
+
+
+    <Button
+        android:id="@+id/buttonSignOutAdmin"
+        android:layout_width="249dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="81dp"
+        android:layout_marginLeft="81dp"
+        android:layout_marginEnd="79dp"
+        android:layout_marginRight="79dp"
+        android:layout_marginBottom="28dp"
+        android:background="@android:color/holo_red_dark"
+        android:text="Sign out"
+        android:textColor="@android:color/white" />
+
+    <ListView
+        android:id="@+id/lvON"
+        android:layout_width="match_parent"
+        android:layout_height="264dp"
+        android:layout_below="@+id/ON"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp" />
+
+    <ListView
+        android:id="@+id/lvOFF"
+        android:layout_width="match_parent"
+        android:layout_height="264dp"
+        android:layout_below="@+id/OFF"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp" />
+
+    <TextView
+        android:id="@+id/ON"
+        android:layout_width="124dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="143dp"
+        android:layout_marginLeft="143dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="143dp"
+        android:layout_marginRight="143dp"
+        android:gravity="center"
+        android:text="ON CLasses"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/OFF"
+        android:layout_width="111dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lvON"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="150dp"
+        android:layout_marginLeft="150dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="149dp"
+        android:layout_marginRight="149dp"
+        android:gravity="center"
+        android:text="OFF Classes"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp" />
+
+</RelativeLayout>

@@ -1,10 +1,8 @@
 package com.example.greencampus;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,18 +23,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import model.User;
+import model.DataModel;
 import model.Class;
+import model.User;
 
 public class ProfileFragment extends Fragment {
 
     TextView name, className, classState, phoneNumber;
     Button buttonSignOut;
     View rootView;
-    FirebaseAuth firebaseAuth;
-    DatabaseReference firebaseDatabase;
+    /*FirebaseAuth firebaseAuth;
+    DatabaseReference firebaseDatabase;*/
+    DataModel data;
 
     @Nullable
     @Override
@@ -50,9 +49,11 @@ public class ProfileFragment extends Fragment {
         phoneNumber = rootView.findViewById(R.id.tvPhoneNumber);
         buttonSignOut = rootView.findViewById(R.id.buttonSignOut);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        /*firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();*/
+
+        data = data.instance;
 
         buttonSignOut.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -60,21 +61,28 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        firebaseDatabase.addValueEventListener(new ValueEventListener() {
+        /*firebaseDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String className = getClassName();
-                saveClassState((HashMap<String, Object>) dataSnapshot.child("classes").child(className).getValue());
+                //String className = getClassName();
+                //saveClassState((HashMap<String, Object>) dataSnapshot.child("classes").child(className).getValue());
+                String className = data.instance.getClassName(getActivity());
+                data.saveClassState(getActivity(),(HashMap<String, Object>) dataSnapshot.child("classes").child(className).getValue());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
-        User user = getUserInfo();
-        Class classe = getClassInfo();
+        data.loadProfile(this.getActivity());
+
+        /*User user = getUserInfo();
+        Class classe = getClassInfo();*/
+
+        User user = data.getLocalUserInfo(this.getActivity());
+        Class classe = data.getLocalClassInfo(this.getActivity());
 
         name.setText(user.getFirstName()+" "+user.getLastName());
         className.setText(user.getClassID());
@@ -84,8 +92,6 @@ public class ProfileFragment extends Fragment {
         if(classe.getIsOn().equals("0")){
             classState.setText("OFF");
         }
-        System.out.println("class is: "+classe.getIsOn());
-        System.out.println("my phone number is: "+user.getPhoneNumber());
 
         phoneNumber.setText(user.getPhoneNumber());
 
@@ -94,7 +100,7 @@ public class ProfileFragment extends Fragment {
 
     }
 
-    public String getUserId(){
+    /*public String getUserId(){
         int mode = Activity.MODE_PRIVATE;
         SharedPreferences  mySharedPreferences ;
         mySharedPreferences=this.getActivity().getSharedPreferences("UserInfo",mode);
@@ -149,7 +155,7 @@ public class ProfileFragment extends Fragment {
        Class classe = new Class(className,classState);
        return classe;
     }
-
+*/
     public void signOut(){
         Intent intent = new Intent(getActivity(), SignInActivity.class);
         startActivity(intent);

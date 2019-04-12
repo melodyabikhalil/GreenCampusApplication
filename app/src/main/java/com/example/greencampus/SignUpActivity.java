@@ -30,8 +30,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
+import model.DataModel;
 import model.User;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -42,11 +44,11 @@ public class SignUpActivity extends AppCompatActivity {
     Spinner spinnerClasses;
     TextView tvError;
     Toolbar toolbar;
+    String signedUpUserID;
 
     FirebaseAuth firebaseAuth;
     DatabaseReference firebaseDatabase;
-
-    Globals globals = new Globals();
+    DataModel data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class SignUpActivity extends AppCompatActivity {
         etPhoneNumber = (TextInputEditText) findViewById(R.id.tietPhone);
         tvError = (TextView) findViewById(R.id.tvError);
 
+        data = DataModel.instance;
+        signedUpUserID = "";
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -101,7 +105,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         //Enable/Disable Dropdown
-        checkboxDelegue.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        /*checkboxDelegue.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                        @Override
                                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                            if (!buttonView.isChecked()) {
@@ -113,7 +117,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                            }
                                                        }
                                                    }
-        );
+        );*/
 
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -133,11 +137,11 @@ public class SignUpActivity extends AppCompatActivity {
             tvError.setText("Please fill in the required fields");
             tvError.setVisibility(View.VISIBLE);
         }
-        else {
-            if(password.length()<6){
-                tvError.setText("Password too short");
-                tvError.setVisibility(View.VISIBLE);
-            }
+        else if (password.length()<6) {
+            tvError.setText("Password too short");
+            tvError.setVisibility(View.VISIBLE);
+        }
+        else{
             Toast toast = Toast.makeText(SignUpActivity.this, "Please wait..", Toast.LENGTH_SHORT);
             toast.show();
 
@@ -150,7 +154,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 toast.show();
                                 Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
                                 startActivity(intent);
-                                globals.setUser(firebaseAuth.getCurrentUser().getUid());
+                                signedUpUserID = firebaseAuth.getCurrentUser().getUid();
                                 createUserData();
                                 finish();
                             } else {
@@ -171,16 +175,16 @@ public class SignUpActivity extends AppCompatActivity {
         String classe = spinnerClasses.getSelectedItem().toString();
         String role;
         User user;
-        if (email.equals("") || password.equals("") || firstName.equals("") || lastName.equals("") || phoneNumber.equals("")) {
+        if (email.equals("") || password.equals("") || firstName.equals("") || lastName.equals("") || phoneNumber.equals("") || classe.equals("")) {
             tvError.setText("Please fill in the required fields");
             tvError.setVisibility(View.VISIBLE);
         } else {
             if (checkboxDelegue.isChecked()) {
                 role = "1";
-                user = new User(globals.getUser(), firstName, lastName, phoneNumber, role, classe);
+                user = new User(signedUpUserID, firstName, lastName, phoneNumber, role, classe);
             } else {
                 role = "0";
-                user = new User(globals.getUser(), firstName, lastName, phoneNumber, role);
+                user = new User(signedUpUserID, firstName, lastName, phoneNumber, role, classe);
             }
             firebaseDatabase.child("users").child(user.getID()).setValue(user);
         }
@@ -193,11 +197,12 @@ public class SignUpActivity extends AppCompatActivity {
             String singleClassName = entry.getKey();
             classesList.add(singleClassName);
         }
+        Collections.sort(classesList);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, classesList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinnerClasses.setAdapter(adapter);
-        spinnerClasses.setEnabled(false);
-        spinnerClasses.setClickable(false);
+//        spinnerClasses.setEnabled(false);
+//        spinnerClasses.setClickable(false);
     }
 }

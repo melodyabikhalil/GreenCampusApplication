@@ -10,6 +10,9 @@ public class User {
     private String Role;
     private String Class;
 
+    public User() {
+    }
+
     public User(String ID, String FirstName, String LastName, String PhoneNumber, String Role, String Class) {
         this.ID = ID;
         this.FirstName = FirstName;

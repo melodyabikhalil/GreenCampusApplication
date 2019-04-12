@@ -1,9 +1,12 @@
 package com.example.greencampus;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +29,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import model.DataModel;
 
 public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -34,13 +40,18 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     TextView tvSignUp, tvInvalidCredentials;
     Button buttonSignIn;
     FirebaseAuth firebaseAuth;
+    DataModel data;
+
+    boolean isAdmin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sign_in);
 
-        clearSharedPreferences();
+        data= DataModel.instance;
+        data.clearSharedPreferences(this);
 
         //Outlets
         tvSignUp = (TextView) findViewById(R.id.tvSignUp);
@@ -50,15 +61,18 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         etPassword = (TextInputEditText) findViewById(R.id.tietPassword);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        isAdmin = false;
+
+        data.clearSharedPreferences(SignInActivity.this);
 
         tvInvalidCredentials.setVisibility(View.INVISIBLE);
 
-        int mode= Activity.MODE_PRIVATE;
-        SharedPreferences mySharedPreferences;
-        mySharedPreferences=getSharedPreferences("UserInfo",mode);
+        loadClassesForAdministrator();
+
+        SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(GreenCampusApplication.getContext());
         SharedPreferences.Editor editor= mySharedPreferences.edit();
         editor.putString("userID","");
-        editor.commit();
+        editor.apply();
 
         tvSignUp.setPaintFlags(tvSignUp.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         tvSignUp.setOnClickListener(new View.OnClickListener(){
@@ -75,9 +89,23 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         });
     }
 
+    public void loadClassesForAdministrator(){
+        data.setClassesOn(new ArrayList());
+        data.loadOnClasses();
+
+        data.setClassesOff(new ArrayList());
+        data.loadOffClasses();
+    }
+
     public void loginUser(){
+
+
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();
+
+        if(email.equals("jihad.renno@usj.edu.lb")){
+            isAdmin=true;
+        }
 
         if (email.equals("") || password.equals("")){
             tvInvalidCredentials.setText("Please fill in the required fields");
@@ -85,24 +113,24 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         }
         else{
 
-            Toast toast = Toast.makeText(SignInActivity.this, "Please wait..", Toast.LENGTH_SHORT);
-            toast.show();
+            /*final ProgressDialog pd = new ProgressDialog(this);
+            pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            pd.setMessage("Please wait..");
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+            pd.show();*/
 
+            final boolean finalIsAdmin = isAdmin;
             firebaseAuth.signInWithEmailAndPassword(email,password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 finish();
                                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                                 String userId = currentUser.getUid();
 
-                                int mode= Activity.MODE_PRIVATE;
-                                SharedPreferences mySharedPreferences;
-                                mySharedPreferences=getSharedPreferences("UserInfo",mode);
-                                SharedPreferences.Editor editor= mySharedPreferences.edit();
-                                editor.putString("userID",userId);
-                                editor.commit();
+                                data.saveUserIDLocally(SignInActivity.this, userId);
 
                                 DatabaseReference firebaseDatabase;
                                 firebaseDatabase = FirebaseDatabase.getInstance().getReference();
@@ -110,43 +138,46 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                                 firebaseDatabase.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        String userId = getUserId();
-                                        collectUserInfo((HashMap<String, Object>) dataSnapshot.child("users").child(userId).getValue());
-                                        String className = getClassName();
-                                        saveClassState((HashMap<String, Object>) dataSnapshot.child("classes").child(className).getValue());
+                                        String userId = data.getLocalUserId(SignInActivity.this);
+                                        data.saveFirebaseUserInfoLocally(SignInActivity.this,(HashMap<String, Object>) dataSnapshot.child("users").child(userId).getValue());
+                                        String className = data.getLocalClassName(SignInActivity.this);
+                                        data.saveFirebaseClassStateLocally(SignInActivity.this, (HashMap<String, Object>) dataSnapshot.child("classes").child(className).getValue());
+                                        startActivity(makeIntent());
+                                        finish();
                                     }
+
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                     }
                                 });
 
-                                //TO REMOVE:
-                                mySharedPreferences=getSharedPreferences("UserInfo",mode);
-                                String classState = mySharedPreferences.getString("classState","");
-
-                                System.out.println("current class state is: abel ma rouh 3al profile: "+classState);
-                                //
-                                Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            else{
+                            } else {
                                 tvInvalidCredentials.setText("Invalid credentials");
                                 tvInvalidCredentials.setVisibility(View.VISIBLE);
-                                int mode= Activity.MODE_PRIVATE;
-                                SharedPreferences mySharedPreferences;
-                                mySharedPreferences=getSharedPreferences("UserInfo",mode);
-                                SharedPreferences.Editor editor= mySharedPreferences.edit();
-                                editor.putString("userID","");
-                                editor.commit();
                             }
-                    }
-            });
+
+                        }
+
+                    });
         }
     }
 
-    public String getUserId(){
+    public Intent makeIntent(){
+        Intent intent;
+        if(isAdmin){
+            intent = new Intent(SignInActivity.this, HomeActivity.class);
+            data.loadReports();
+            intent.putExtra("role","2");
+        }
+        else{
+            intent = new Intent(SignInActivity.this, HomeActivity.class);
+            intent.putExtra("role","1");
+        }
+        return intent;
+    }
+
+    /*public String getUserId(){
         int mode = Activity.MODE_PRIVATE;
         SharedPreferences  mySharedPreferences ;
         mySharedPreferences=getSharedPreferences("UserInfo",mode);
@@ -164,6 +195,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         String lastname = (String) userInfo.get("lastName");
         String phonenumber = (String) userInfo.get("phoneNumber");
         String role = (String) userInfo.get("role");
+        System.out.println("The role is: "+role);
         String classe;
 
         if(role.equals("1")){
@@ -205,9 +237,13 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
         String classState = (String) classInfo.get("isOn");
         editor.putString("classState",classState);
+
+        String classStatee = mySharedPreferences.getString("classState","");
+        System.out.println("state li now sayyavta: "+classState);
+
         editor.commit();
     }
-
+*/
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
