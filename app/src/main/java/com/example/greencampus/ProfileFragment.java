@@ -1,7 +1,11 @@
 package com.example.greencampus;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +33,13 @@ import model.DataModel;
 import model.Class;
 import model.User;
 
+import static model.Helper.BROADCAST_ACTION_CHANGE_CLASS_STATE_FAILED;
+import static model.Helper.BROADCAST_ACTION_CHANGE_CLASS_STATE_SUCESS;
+import static model.Helper.BROADCAST_ACTION_PROFILE_FAILED;
+import static model.Helper.BROADCAST_ACTION_PROFILE_LOADED;
+import static model.Helper.BROADCAST_ACTION_UPLOAD_IMAGE_FAILED;
+import static model.Helper.BROADCAST_ACTION_UPLOAD_IMAGE_SUCESS;
+
 public class ProfileFragment extends Fragment {
 
     TextView name, className, classState, phoneNumber;
@@ -36,6 +48,29 @@ public class ProfileFragment extends Fragment {
     /*FirebaseAuth firebaseAuth;
     DatabaseReference firebaseDatabase;*/
     DataModel data;
+//    ProgressDialog progressDialog;
+    private User user;
+    private Class classe;
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if(action.equals(BROADCAST_ACTION_PROFILE_FAILED)) {
+                Toast toast = Toast.makeText(getContext(), "Could not load profile. Please try again later", Toast.LENGTH_LONG);
+                toast.show();
+            }
+
+            if(action.equals(BROADCAST_ACTION_PROFILE_LOADED)){
+                user = data.getLocalUserInfo(GreenCampusApplication.getContext());
+                classe = data.getLocalClassInfo(GreenCampusApplication.getContext());
+                showProfileInfo();
+            }
+
+        }
+    };
+
 
     @Nullable
     @Override
@@ -48,12 +83,19 @@ public class ProfileFragment extends Fragment {
         classState = rootView.findViewById(R.id.tvClassState);
         phoneNumber = rootView.findViewById(R.id.tvPhoneNumber);
         buttonSignOut = rootView.findViewById(R.id.buttonSignOut);
-
+//        progressDialog = new ProgressDialog(getActivity());
         /*firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();*/
 
         data = data.instance;
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BROADCAST_ACTION_PROFILE_FAILED);
+        filter.addAction(BROADCAST_ACTION_PROFILE_LOADED);
+
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(receiver, filter);
 
         buttonSignOut.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -76,24 +118,13 @@ public class ProfileFragment extends Fragment {
             }
         });*/
 
+//        progressDialog.setMessage("Loading. Please wait..");
+//        progressDialog.show();
         data.loadProfile(this.getActivity());
 
         /*User user = getUserInfo();
         Class classe = getClassInfo();*/
 
-        User user = data.getLocalUserInfo(this.getActivity());
-        Class classe = data.getLocalClassInfo(this.getActivity());
-
-        name.setText(user.getFirstName()+" "+user.getLastName());
-        className.setText(user.getClassID());
-        if(classe.getIsOn().equals("1")){
-            classState.setText("ON");
-        }
-        if(classe.getIsOn().equals("0")){
-            classState.setText("OFF");
-        }
-
-        phoneNumber.setText(user.getPhoneNumber());
 
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Profile");
         return rootView;
@@ -162,5 +193,33 @@ public class ProfileFragment extends Fragment {
         getActivity().finish();
     }
 
+    public void showProfileInfo(){
+        name.setText(user.getFirstName()+" "+user.getLastName());
+        className.setText(user.getClassID());
+        if(classe.getIsOn().equals("1")){
+            classState.setText("ON");
+        }
+        if(classe.getIsOn().equals("0")){
+            classState.setText("OFF");
+        }
 
+        phoneNumber.setText(user.getPhoneNumber());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BROADCAST_ACTION_PROFILE_FAILED);
+        filter.addAction(BROADCAST_ACTION_PROFILE_LOADED);
+
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(receiver, filter);
+    }
 }

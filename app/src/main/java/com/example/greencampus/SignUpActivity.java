@@ -1,6 +1,10 @@
 package com.example.greencampus;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,7 +38,17 @@ import java.util.Collections;
 import java.util.Map;
 
 import model.DataModel;
+import model.Helper;
 import model.User;
+
+import static model.Helper.BROADCAST_ACTION_ADMINS_LOADED;
+import static model.Helper.BROADCAST_ACTION_LOGIN_FAILED;
+import static model.Helper.BROADCAST_ACTION_LOGIN_SUCCESS;
+import static model.Helper.BROADCAST_ACTION_SIGN_UP_FAILED;
+import static model.Helper.BROADCAST_ACTION_SIGN_UP_SUCCESS;
+import static model.Helper.BROADCAST_ACTION_SIGN_UP_USER_DATA_FAILED;
+import static model.Helper.BROADCAST_ACTION_SIGN_UP_USER_DATA_SUCCESS;
+import static model.Helper.BROADCAST_ACTION_USER_CLASS_FAILED;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -45,10 +59,43 @@ public class SignUpActivity extends AppCompatActivity {
     TextView tvError;
     Toolbar toolbar;
     String signedUpUserID;
+    ProgressDialog progressDialog;
 
     FirebaseAuth firebaseAuth;
     DatabaseReference firebaseDatabase;
     DataModel data;
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if(action.equals(BROADCAST_ACTION_SIGN_UP_FAILED)) {
+                progressDialog.dismiss();
+                tvError.setText("Invalid email");
+                tvError.setVisibility(View.VISIBLE);
+            }
+
+            if(action.equals(Helper.BROADCAST_ACTION_SIGN_UP_SUCCESS)){
+                progressDialog.dismiss();
+                Intent intentToSignIn = new Intent(SignUpActivity.this, SignInActivity.class);
+                startActivity(intentToSignIn);
+                signedUpUserID = firebaseAuth.getCurrentUser().getUid();
+                createUserData();
+                finish();
+            }
+
+            if(action.equals(Helper.BROADCAST_ACTION_SIGN_UP_USER_DATA_FAILED)){
+                Toast toast = Toast.makeText(SignUpActivity.this, "Could not create user.", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+
+            if(action.equals(Helper.BROADCAST_ACTION_SIGN_UP_USER_DATA_SUCCESS)){
+                Toast toast = Toast.makeText(SignUpActivity.this, "User created successfully.", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +114,17 @@ public class SignUpActivity extends AppCompatActivity {
         etPhoneNumber = (TextInputEditText) findViewById(R.id.tietPhone);
         tvError = (TextView) findViewById(R.id.tvError);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_FAILED);
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_SUCCESS);
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_USER_DATA_FAILED);
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_USER_DATA_SUCCESS);
+
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
+
         data = DataModel.instance;
+        progressDialog = new ProgressDialog(SignUpActivity.this);
         signedUpUserID = "";
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
@@ -142,27 +199,28 @@ public class SignUpActivity extends AppCompatActivity {
             tvError.setVisibility(View.VISIBLE);
         }
         else{
-            Toast toast = Toast.makeText(SignUpActivity.this, "Please wait..", Toast.LENGTH_SHORT);
-            toast.show();
+            progressDialog.setMessage("Please wait..");
+            progressDialog.show();
+            data.signUpUser(email,password);
 
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                Toast toast = Toast.makeText(SignUpActivity.this, "User created", Toast.LENGTH_SHORT);
-                                toast.show();
-                                Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
-                                startActivity(intent);
-                                signedUpUserID = firebaseAuth.getCurrentUser().getUid();
-                                createUserData();
-                                finish();
-                            } else {
-                                tvError.setText("Invalid email");
-                                tvError.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    });
+//            firebaseAuth.createUserWithEmailAndPassword(email, password)
+//                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<AuthResult> task) {
+//                            if (task.isSuccessful()) {
+//                                Toast toast = Toast.makeText(SignUpActivity.this, "User created", Toast.LENGTH_SHORT);
+//                                toast.show();
+//                                Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+//                                startActivity(intent);
+//                                signedUpUserID = firebaseAuth.getCurrentUser().getUid();
+//                                createUserData();
+//                                finish();
+//                            } else {
+//                                tvError.setText("Invalid email");
+//                                tvError.setVisibility(View.VISIBLE);
+//                            }
+//                        }
+//                    });
         }
     }
 
@@ -186,7 +244,8 @@ public class SignUpActivity extends AppCompatActivity {
                 role = "0";
                 user = new User(signedUpUserID, firstName, lastName, phoneNumber, role, classe);
             }
-            firebaseDatabase.child("users").child(user.getID()).setValue(user);
+//            firebaseDatabase.child("users").child(user.getID()).setValue(user);
+            data.signUpUserData(user);
         }
     }
 
@@ -204,5 +263,25 @@ public class SignUpActivity extends AppCompatActivity {
         spinnerClasses.setAdapter(adapter);
 //        spinnerClasses.setEnabled(false);
 //        spinnerClasses.setClickable(false);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_FAILED);
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_SUCCESS);
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_USER_DATA_FAILED);
+        filter.addAction(BROADCAST_ACTION_SIGN_UP_USER_DATA_SUCCESS);
+
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
     }
 }

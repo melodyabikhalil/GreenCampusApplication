@@ -1,9 +1,10 @@
 package com.example.greencampus;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.preference.PreferenceManager;
@@ -31,19 +32,53 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import model.Admin;
 import model.DataModel;
+import model.Helper;
+
+import static model.Helper.*;
 
 public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     TextInputEditText etEmail,etPassword;
     TextView tvSignUp, tvInvalidCredentials;
     Button buttonSignIn;
-    FirebaseAuth firebaseAuth;
+//    FirebaseAuth firebaseAuth;
     DataModel data;
-
     boolean isAdmin;
+    List<Admin> admins;
+    ProgressDialog progressDialog;
 
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if(action.equals(BROADCAST_ACTION_ADMINS_LOADED)) {
+               admins = data.getAdmins();
+            }
+
+            if(action.equals(Helper.BROADCAST_ACTION_LOGIN_SUCCESS)){
+                progressDialog.dismiss();
+                startActivity(makeIntent());
+                finish();
+            }
+
+            if(action.equals(Helper.BROADCAST_ACTION_LOGIN_FAILED)){
+                progressDialog.dismiss();
+                tvInvalidCredentials.setText("Invalid credentials");
+                tvInvalidCredentials.setVisibility(View.VISIBLE);
+            }
+
+            if(action.equals(Helper.BROADCAST_ACTION_USER_CLASS_FAILED)){
+                progressDialog.dismiss();
+                Toast toast = Toast.makeText(SignInActivity.this, "Error, please try again later.", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,20 +94,31 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         buttonSignIn = (Button) findViewById(R.id.buttonSignIn);
         etEmail = (TextInputEditText) findViewById(R.id.tietEmail);
         etPassword = (TextInputEditText) findViewById(R.id.tietPassword);
+        admins = new ArrayList();
+        progressDialog = new ProgressDialog(SignInActivity.this);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+//        firebaseAuth = FirebaseAuth.getInstance();
         isAdmin = false;
 
         data.clearSharedPreferences(SignInActivity.this);
 
         tvInvalidCredentials.setVisibility(View.INVISIBLE);
 
-        loadClassesForAdministrator();
-
         SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(GreenCampusApplication.getContext());
         SharedPreferences.Editor editor= mySharedPreferences.edit();
         editor.putString("userID","");
         editor.apply();
+
+        data.getAdministrators();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BROADCAST_ACTION_ADMINS_LOADED);
+        filter.addAction(BROADCAST_ACTION_LOGIN_SUCCESS);
+        filter.addAction(BROADCAST_ACTION_LOGIN_FAILED);
+        filter.addAction(BROADCAST_ACTION_USER_CLASS_FAILED);
+
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
 
         tvSignUp.setPaintFlags(tvSignUp.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         tvSignUp.setOnClickListener(new View.OnClickListener(){
@@ -103,8 +149,10 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();
 
-        if(email.equals("jihad.renno@usj.edu.lb")){
-            isAdmin=true;
+        for(int i =0; i<adminsEmailsList.size();++i){
+            if(email.equals(adminsEmailsList.get(i))){
+                isAdmin=true;
+            }
         }
 
         if (email.equals("") || password.equals("")){
@@ -113,22 +161,21 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         }
         else{
 
-            /*final ProgressDialog pd = new ProgressDialog(this);
-            pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            pd.setMessage("Please wait..");
-            pd.setIndeterminate(true);
-            pd.setCancelable(false);
-            pd.show();*/
-
-            final boolean finalIsAdmin = isAdmin;
-            firebaseAuth.signInWithEmailAndPassword(email,password)
+//            final boolean finalIsAdmin = isAdmin;
+            progressDialog.setMessage("Please wait..");
+            progressDialog.show();
+            data.loginUser(email,password);
+            /*firebaseAuth.signInWithEmailAndPassword(email,password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                finish();
+//                                finish();
                                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                                 String userId = currentUser.getUid();
+
+                                Toast toast = Toast.makeText(SignInActivity.this, "Please wait..", Toast.LENGTH_SHORT);
+                                toast.show();
 
                                 data.saveUserIDLocally(SignInActivity.this, userId);
 
@@ -159,22 +206,42 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
                         }
 
-                    });
+                    });*/
         }
     }
 
     public Intent makeIntent(){
         Intent intent;
+        intent = new Intent(SignInActivity.this, HomeActivity.class);
         if(isAdmin){
-            intent = new Intent(SignInActivity.this, HomeActivity.class);
-            data.loadReports();
+//            data.loadReports();
+//            loadClassesForAdministrator();
             intent.putExtra("role","2");
         }
         else{
-            intent = new Intent(SignInActivity.this, HomeActivity.class);
             intent.putExtra("role","1");
         }
         return intent;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BROADCAST_ACTION_ADMINS_LOADED);
+        filter.addAction(BROADCAST_ACTION_LOGIN_SUCCESS);
+        filter.addAction(BROADCAST_ACTION_LOGIN_FAILED);
+        filter.addAction(BROADCAST_ACTION_USER_CLASS_FAILED);
+
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
     }
 
     /*public String getUserId(){
