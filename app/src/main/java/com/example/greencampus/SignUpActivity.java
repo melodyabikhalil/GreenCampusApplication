@@ -18,14 +18,9 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,14 +36,10 @@ import model.DataModel;
 import model.Helper;
 import model.User;
 
-import static model.Helper.BROADCAST_ACTION_ADMINS_LOADED;
-import static model.Helper.BROADCAST_ACTION_LOGIN_FAILED;
-import static model.Helper.BROADCAST_ACTION_LOGIN_SUCCESS;
 import static model.Helper.BROADCAST_ACTION_SIGN_UP_FAILED;
 import static model.Helper.BROADCAST_ACTION_SIGN_UP_SUCCESS;
 import static model.Helper.BROADCAST_ACTION_SIGN_UP_USER_DATA_FAILED;
 import static model.Helper.BROADCAST_ACTION_SIGN_UP_USER_DATA_SUCCESS;
-import static model.Helper.BROADCAST_ACTION_USER_CLASS_FAILED;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -161,21 +152,6 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        //Enable/Disable Dropdown
-        /*checkboxDelegue.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                       @Override
-                                                       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                           if (!buttonView.isChecked()) {
-                                                               spinnerClasses.setEnabled(false);
-                                                               spinnerClasses.setClickable(false);
-                                                           } else {
-                                                               spinnerClasses.setEnabled(true);
-                                                               spinnerClasses.setClickable(true);
-                                                           }
-                                                       }
-                                                   }
-        );*/
-
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
               createUser();
@@ -203,24 +179,6 @@ public class SignUpActivity extends AppCompatActivity {
             progressDialog.show();
             data.signUpUser(email,password);
 
-//            firebaseAuth.createUserWithEmailAndPassword(email, password)
-//                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<AuthResult> task) {
-//                            if (task.isSuccessful()) {
-//                                Toast toast = Toast.makeText(SignUpActivity.this, "User created", Toast.LENGTH_SHORT);
-//                                toast.show();
-//                                Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
-//                                startActivity(intent);
-//                                signedUpUserID = firebaseAuth.getCurrentUser().getUid();
-//                                createUserData();
-//                                finish();
-//                            } else {
-//                                tvError.setText("Invalid email");
-//                                tvError.setVisibility(View.VISIBLE);
-//                            }
-//                        }
-//                    });
         }
     }
 
@@ -244,7 +202,6 @@ public class SignUpActivity extends AppCompatActivity {
                 role = "0";
                 user = new User(signedUpUserID, firstName, lastName, phoneNumber, role, classe);
             }
-//            firebaseDatabase.child("users").child(user.getID()).setValue(user);
             data.signUpUserData(user);
         }
     }
@@ -261,8 +218,6 @@ public class SignUpActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinnerClasses.setAdapter(adapter);
-//        spinnerClasses.setEnabled(false);
-//        spinnerClasses.setClickable(false);
     }
 
     @Override

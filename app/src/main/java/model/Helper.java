@@ -1,12 +1,9 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Helper {
-    public static String BROADCAST_ACTION_ADMINS_LOADED = "com.example.greencampus.ADMINS_LOADED_SUCCESS";
-    public static String BROADCAST_ACTION_ADMINS_FAILED = "com.example.greencampus.ADMINS_LOADED_FAILED";
 
     public static String BROADCAST_ACTION_LOGIN_SUCCESS = "com.example.greencampus.LOGIN_SUCCESS";
     public static String BROADCAST_ACTION_LOGIN_FAILED = "com.example.greencampus.LOGIN_FAILED";
@@ -48,5 +45,4 @@ public class Helper {
     public static String BROADCAST_ACTION_SIGN_UP_USER_DATA_FAILED = "com.example.greencampus.SIGN_UP_USER_DATA_FAILED";
 
     public static List adminsEmailsList = Arrays.asList(new String[]{"jihad.renno@usj.edu.lb"});
-
 }

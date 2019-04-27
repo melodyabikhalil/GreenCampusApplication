@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LightFragment">
+    tools:context=".Student.LightFragment">
 
 
     <Button
@@ -62,7 +62,7 @@
         android:layout_marginRight="111dp"
         android:gravity="center"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

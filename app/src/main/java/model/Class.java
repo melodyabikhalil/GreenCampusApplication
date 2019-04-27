@@ -26,6 +26,9 @@ public class Class {
         this.isOn = isOn;
     }
 
+    public Class() {
+    }
+
     public String getClassName() {
         return classID;
     }

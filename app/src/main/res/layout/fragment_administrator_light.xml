@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdministratorLightFragment"
+    tools:context=".Administrator.AdministratorLightFragment"
     android:tag="fragment_admin_light">
 
 
@@ -36,7 +36,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginStart="0dp"
         android:layout_marginLeft="0dp"
-        android:layout_marginTop="41dp"
+        android:layout_marginTop="11dp"
         android:layout_marginEnd="0dp"
         android:layout_marginRight="0dp" />
 
@@ -53,7 +53,8 @@
         android:layout_marginLeft="0dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="0dp"
-        android:layout_marginRight="0dp" />
+        android:layout_marginRight="0dp"
+        />
 
     <TextView
         android:id="@+id/ON"
@@ -72,7 +73,7 @@
         android:gravity="center"
         android:text="ON CLasses"
         android:textColor="@color/colorPrimary"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/OFF"
@@ -83,14 +84,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="150dp"
-        android:layout_marginLeft="150dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="149dp"
-        android:layout_marginRight="149dp"
+        android:layout_marginStart="148dp"
+        android:layout_marginLeft="148dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="151dp"
+        android:layout_marginRight="151dp"
         android:gravity="center"
         android:text="OFF Classes"
         android:textColor="@color/colorPrimary"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
 </RelativeLayout>

@@ -7,7 +7,12 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
+
+import com.example.greencampus.Administrator.AdministratorLightFragment;
+import com.example.greencampus.Administrator.AdministratorReportFragment;
+import com.example.greencampus.Student.LightFragment;
+import com.example.greencampus.Student.ProfileFragment;
+import com.example.greencampus.Student.ReportFragment;
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
 
@@ -21,7 +26,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        //getting bottom navigation view and attaching the listener
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
 
@@ -75,7 +79,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private boolean loadFragment(Fragment fragment) {
-        //switching fragment
         if (fragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()

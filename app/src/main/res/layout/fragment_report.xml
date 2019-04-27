@@ -5,7 +5,7 @@
     android:id="@+id/etReport"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LightFragment">
+    tools:context=".Student.LightFragment">
 
     <EditText
         android:id="@+id/etMessage"
